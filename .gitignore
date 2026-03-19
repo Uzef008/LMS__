@@ -1,0 +1,41 @@
+# Node.js + Next.js dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Testing
+coverage/
+
+# Next.js build output
+.next/
+out/
+
+# Production build output
+dist/
+build/
+
+# Environment files (MUST IGNORE)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# Misc system files
+.DS_Store
+*.pem
+*.log
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Prisma
+/backend/prisma/migrations/
+/backend/prisma/sqlite.db
+/backend/node_modules/
+/backend/.env

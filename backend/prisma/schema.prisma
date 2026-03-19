@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String          @id @default(uuid())
+  email          String          @unique
+  password       String
+  name           String
+  createdAt      DateTime        @default(now())
+  refreshTokens  RefreshToken[]
+  videoProgress  VideoProgress[]
+}
+
+model Subject {
+  id          String    @id @default(uuid())
+  title       String
+  slug        String    @unique
+  description String?   @db.Text
+  isPublished Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  sections    Section[]
+}
+
+model Section {
+  id         String   @id @default(uuid())
+  subjectId  String
+  subject    Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  title      String
+  orderIndex Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  videos     Video[]
+}
+
+model Video {
+  id             String          @id @default(uuid())
+  sectionId      String
+  section        Section         @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?         @db.Text
+  youtubeUrl     String
+  orderIndex     Int
+  durationSeconds Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  progress       VideoProgress[]
+}
+
+model VideoProgress {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId             String
+  video               Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  lastPositionSeconds Int      @default(0)
+  isCompleted         Boolean  @default(false)
+  completedAt         DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([userId, videoId])
+}
+
+model RefreshToken {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+}
